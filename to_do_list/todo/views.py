@@ -5,6 +5,9 @@ from rest_framework import status
 from .serializers import TaskSerializer
 import logging
 
+# For Templates
+from django.shortcuts import render
+
 # Getting logger for our todo app
 logger = logging.getLogger("todo")
 
@@ -177,3 +180,11 @@ class TaskCountView(APIView):
         except Exception as e:
             logger.error(f"Some exception occured while getting total number of tasks Exception: {e}")
             return Response({"error": "Not able to get count"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# %%%%%%%%%%%%%%% TEMPLATE SECTION %%%%%%%%%%%%%%%%%%%%
+
+def list_tasks_page(request):
+    return render(request, "todo/list_task.html")
+
+def add_task_page(request):
+    return render(request, "todo/add_task.html")

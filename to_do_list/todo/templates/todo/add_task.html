@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Task</title>
+</head>
+<body>
+
+<h2>Add Task</h2>
+
+<form id="task-form">
+    <label>Title:</label><br>
+    <input type="text" id="title" required><br><br>
+
+    <label>Description:</label><br>
+    <textarea id="description"></textarea><br><br>
+
+    <label>Status:</label><br>
+    <select id="status">
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+    </select><br><br>
+
+    <button type="submit">Create Task</button>
+</form>
+
+<script>
+document.getElementById("task-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    fetch("/api/tasks/", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            status: document.getElementById("status").value
+        })
+    })
+    .then(response => response.json())
+    .then(() => {
+        window.location.href = "/";
+    })
+    .catch(err => console.error(err));
+});
+</script>
+
+</body>
+</html>

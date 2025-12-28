@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Todo List</title>
+</head>
+<body>
+
+<h2>Todo List</h2>
+<a href="/add-task/">Add Task</a>
+
+<table border="1">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Due Date</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody id="task-table">
+    </tbody>
+</table>
+
+<script>
+fetch("/api/tasks/")
+    .then(response => response.json())
+    .then(data => {
+        const table = document.getElementById("task-table");
+        table.innerHTML = "";
+
+        data.forEach(task => {
+            const row = `
+                <tr>
+                    <td>${task.title}</td>
+                    <td>${task.description || ""}</td>
+                    <td>${task.due_date}</td>
+                    <td>${task.status}</td>
+                </tr>
+            `;
+            table.innerHTML += row;
+        });
+    })
+    .catch(err => console.error(err));
+</script>
+
+</body>
+</html>
