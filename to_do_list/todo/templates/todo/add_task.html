@@ -1,18 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Task</title>
+    <title id="page-title">Add Task</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 25px 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #43a047;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px;
+            }
+
+            form {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<h2>Add Task</h2>
+<h2 id="form-title">Add Task</h2>
 
 <form id="task-form">
+    <input type="hidden" id="task-id">
     <label>Title:</label><br>
     <input type="text" id="title" required><br><br>
 
     <label>Description:</label><br>
     <textarea id="description"></textarea><br><br>
+
+    <label>Due Date</label><br>
+    <input type="date" id="due_date"><br><br>
 
     <label>Status:</label><br>
     <select id="status">
@@ -20,30 +99,56 @@
         <option value="completed">Completed</option>
     </select><br><br>
 
-    <button type="submit">Create Task</button>
+    <button type="submit" id="submit-btn">Create Task</button>
 </form>
 
 <script>
+    const task = JSON.parse(localStorage.getItem("edit-task"));
+    if (task) {
+        console.log(task)
+        document.getElementById("page-title").innerText = "Edit Task";
+        document.getElementById("form-title").innerText = "Edit Task";
+        document.getElementById("submit-btn").innerText = "Update";
+
+        document.getElementById("task-id").value = task.id;
+        document.getElementById("title").value = task.title;
+        document.getElementById("description").value = task.description;
+        document.getElementById("due_date").value = get_date_str(task.due_date);
+        document.getElementById("status").value = task.status;
+    }
+
 document.getElementById("task-form").addEventListener("submit", function(e) {
     e.preventDefault();
-
-    fetch("/api/tasks/", {
-        method: "POST",
+    let id     = document.getElementById("task-id").value
+    let url    = id ? `/api/tasks/${id}/` : "/api/tasks/"
+    let method = id ? "PUT" : "POST"
+    fetch(url, {
+        method: method,
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({
             title: document.getElementById("title").value,
             description: document.getElementById("description").value,
+            due_date: get_date_ts(),
             status: document.getElementById("status").value
         })
     })
     .then(response => response.json())
     .then(() => {
+        localStorage.removeItem("edit-task");
         window.location.href = "/";
     })
     .catch(err => console.error(err));
 });
+
+function get_date_ts(){
+    let due_date = document.getElementById("due_date").value
+    return new Date(due_date).getTime()
+}
+function get_date_str(TS){
+    return new Date(TS).toISOString().split("T")[0]
+}
 </script>
 
 </body>

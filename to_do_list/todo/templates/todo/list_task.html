@@ -2,19 +2,129 @@
 <html>
 <head>
     <title>Todo List</title>
+        <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        a {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        a:hover {
+            background-color: #43a047;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        thead {
+            background-color: #1976d2;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        button {
+            padding: 6px 12px;
+            margin-right: 6px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        button:first-child {
+            background-color: #ff9800;
+            color: white;
+        }
+
+        button:first-child:hover {
+            background-color: #fb8c00;
+        }
+
+        button:last-child {
+            background-color: #f44336;
+            color: white;
+        }
+
+        button:last-child:hover {
+            background-color: #e53935;
+        }
+
+        td:last-child {
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead {
+                display: none;
+            }
+
+            tr {
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                padding: 10px;
+            }
+
+            td {
+                border: none;
+                padding: 6px 0;
+            }
+
+            td::before {
+                font-weight: bold;
+                display: block;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <h2>Todo List</h2>
 <a href="/add-task/">Add Task</a>
 
-<table border="1">
+<table>
     <thead>
         <tr>
             <th>Title</th>
             <th>Description</th>
             <th>Due Date</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody id="task-table">
@@ -33,14 +143,42 @@ fetch("/api/tasks/")
                 <tr>
                     <td>${task.title}</td>
                     <td>${task.description || ""}</td>
-                    <td>${task.due_date}</td>
+                    <td>${get_date_str(task.due_date)}</td>
                     <td>${task.status}</td>
+                    <td><button onclick="
+                        edit_task(${task.id}, '${task.title}', '${task.description || ""}',
+                            ${task.due_date}, '${task.status}')">Edit
+                        </button>
+                        <button onclick="delete_task(${task.id})">Delete</button>
+                    </td>
                 </tr>
             `;
             table.innerHTML += row;
         });
     })
     .catch(err => console.error(err));
+
+function edit_task(id, title, description, due_date, status){
+    localStorage.setItem("edit-task", JSON.stringify({
+        id, title, description, due_date, status
+    }));
+    window.location.href = '/add-task';
+    };
+function get_date_str(TS){
+    return new Date(TS).toISOString().split("T")[0]
+};
+
+function delete_task(id){
+    fetch(`/api/tasks/${id}/`,{
+        method : "DELETE"
+    })
+    .then(response => response.json())
+    .then(()=>{
+        window.location.href = "/"
+    })
+    .catch(error => console.error(error));
+};
+
 </script>
 
 </body>

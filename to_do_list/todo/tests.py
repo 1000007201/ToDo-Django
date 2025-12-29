@@ -38,9 +38,9 @@ class TaskAPITest(APITestCase):
 
     def test_put_tasks(self):
         Payload  = {"title": "Demo Todo", "status": "completed"}
-        Response = self.client.put(f'/api/tasks/{self.TaskID}', Payload, format="json")
+        Response = self.client.put(f'/api/tasks/{self.TaskID}/', Payload, format="json")
         self.assertEqual(Response.status_code, 200)
 
     def test_delete_tasks(self):
-        Response = self.client.delete(f'/api/tasks/{self.TaskID}')
+        Response = self.client.delete(f'/api/tasks/{self.TaskID}/')
         self.assertEqual(Response.status_code, 200)   
