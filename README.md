@@ -58,10 +58,11 @@ to_do_list
         cd TODO-DJANGO
 #   Create and activate virtual environment
         python3 -m venv venv
-        source venv/bin/activate
+        source venv/bin/activate   <!--In case of linux/macos -->
 #   Install Dependencies
         pip install django djangorestframework
 #   DataBase Setup(Since Django ORM is not used in this project, the database table must be created manually using the Django Python shell.)
+        cd to_do_list
         python3 manage.py shell
         <!-- Inside Shell -->
        >from django.db import connection
